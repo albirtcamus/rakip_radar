@@ -275,10 +275,10 @@
 </nav>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script src="core.js"></script>
+<script src="core.js?v=2.1"></script>
 <script>
 'use strict';
-const VERSION = '2.0';
+const VERSION = '2.1';
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 
@@ -467,8 +467,9 @@ async function loop() {
     const frame = grabFrame();
     if (!frame) { await sleep(200); continue; }
     const t0 = performance.now();
-    try { const { data } = await worker.recognize(frame); handleText(data.text || ''); } catch (e) { console.warn(e); }
-    $('#perf').textContent = 'Taranıyor · kare başına ' + Math.round(performance.now() - t0) + ' ms';
+    let err = null;
+    try { const { data } = await worker.recognize(frame); handleText(data.text || ''); } catch (e) { err = e; console.warn(e); }
+    $('#perf').textContent = err ? 'Okuma hatası: ' + (err.message || err) : 'Taranıyor · kare başına ' + Math.round(performance.now() - t0) + ' ms';
     await sleep(60);
   }
 }
@@ -736,6 +737,12 @@ $('#importFile').onchange = async e => {
 };
 
 renderReport(); renderAccLine(); drawRoi();
+// Dosyalar karışık sürüm olursa sessizce bozulmak yerine uyar
+if (!window.Core || Core.VERSION !== VERSION) {
+  $('#camHint').textContent = 'Dosyalar uyumsuz: uygulama ' + VERSION + ', core.js ' + ((window.Core && Core.VERSION) || 'eski') + '. Uygulamayı tamamen kapatıp yeniden aç. Düzelmezse GitHub\'a core.js dosyasını tekrar yükle.';
+  $('#camHint').style.color = 'var(--yellow)';
+  $('#startBtn').disabled = true;
+}
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 </body>

@@ -7,7 +7,7 @@
 
   // Eşleştirme anahtarı: küçük harf, karışan harfler birleşik, _ - . ve boşluk yok.
   function normKey(s) {
-    s = (s || '').toLowerCase()
+    s = String(s || '').toLowerCase()
       .replace(/ı/g, 'i').replace(/ş/g, 's').replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ö/g, 'o').replace(/ç/g, 'c');
     let out = '';
     for (const ch of s) {
@@ -142,6 +142,6 @@
     return null;
   }
 
-  root.Core = { normKey, lev, score, threshold, findKnown, extractOpponent, isOwn };
+  root.Core = { VERSION: '2.1', normKey, lev, score, threshold, findKnown, extractOpponent, isOwn };
   if (typeof module !== 'undefined') module.exports = root.Core;
 })(typeof self !== 'undefined' ? self : this);
