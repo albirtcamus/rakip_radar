@@ -70,8 +70,11 @@
   }
 
   // Kareye düşen herhangi bir kelime listedeki biriyle eşleşiyor mu?
-  function findKnown(text, db, ownNick) {
-    const ownKey = normKey(ownNick);
+  function ownList(own) { return (Array.isArray(own) ? own : [own]).filter(Boolean).map(normKey).filter(Boolean); }
+
+  // db: [{key, ...}] — her eleman bir isim veya öğrenilmiş yanlış okuma olabilir.
+  function findKnown(text, db, own) {
+    const owns = ownList(own);
     const cands = new Set();
     for (const line of tokenize(text)) {
       for (let i = 0; i < line.length; i++) {
@@ -85,7 +88,7 @@
     }
     let best = null;
     for (const k of cands) {
-      if (ownKey && score(k, ownKey) >= 0.8) continue;
+      if (owns.some(o => score(k, o) >= 0.8)) continue;
       for (const r of db) {
         const s = score(k, r.key);
         if (s >= threshold(r.key.length) && (!best || s > best.score)) best = { rec: r, score: s, read: k };
@@ -94,8 +97,9 @@
     return best;
   }
 
-  function isOwn(tok, ownNick) {
-    return ownNick && score(normKey(tok), normKey(ownNick)) >= 0.8;
+  function isOwn(tok, own) {
+    const k = normKey(tok);
+    return ownList(own).some(o => score(k, o) >= 0.8);
   }
 
   // Ekrandaki metinden rakibin nickini çıkarır. Bulamazsa null.

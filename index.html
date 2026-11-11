@@ -7,212 +7,359 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Rakip Radar">
-<meta name="theme-color" content="#0f1115">
+<meta name="theme-color" content="#0f2a20">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <title>Rakip Radar</title>
 <style>
-  :root { --bg:#0f1115; --card:#1a1d24; --line:#2a2e38; --text:#eef0f4; --mute:#8a8f98;
-          --toxic:#e5383b; --iyi:#f4a100; --kolay:#2bb673; --normal:#8a8f98; --yeni:#3a7bd5; }
+  :root {
+    --pitch:#0f2a20; --stripe:#12321f; --deep:#0a1f17; --line:rgba(242,245,239,.14);
+    --chalk:#f2f5ef; --turf:#8fab9b;
+    --red:#e0262f; --yellow:#f5c518; --white:#f2f5ef; --new:#5aa9ff;
+    --cond:'Barlow Condensed','Arial Narrow',sans-serif-condensed,system-ui,sans-serif;
+    --body:'Barlow',-apple-system,system-ui,sans-serif;
+  }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html,body { margin:0; background:var(--bg); color:var(--text); font-family:-apple-system,system-ui,sans-serif; }
-  body { padding:env(safe-area-inset-top) 0 calc(64px + env(safe-area-inset-bottom)); min-height:100vh; }
-  nav { position:fixed; left:0; right:0; bottom:0; display:flex; background:#14171c; border-top:1px solid var(--line);
-        padding-bottom:env(safe-area-inset-bottom); z-index:20; }
-  nav button { flex:1; background:none; border:0; color:var(--mute); padding:10px 0 12px; font-size:12px; }
-  nav button b { display:block; font-size:20px; margin-bottom:2px; }
-  nav button.on { color:var(--text); }
-  section { display:none; padding:12px; }
+  html { background:var(--pitch); }
+  body {
+    margin:0; color:var(--chalk); font:400 16px/1.45 var(--body);
+    background:repeating-linear-gradient(180deg, var(--pitch) 0 72px, var(--stripe) 72px 144px);
+    padding:env(safe-area-inset-top) 0 calc(76px + env(safe-area-inset-bottom)); min-height:100vh;
+  }
+  button { font-family:inherit; color:inherit; cursor:pointer; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible { outline:2px solid var(--yellow); outline-offset:2px; }
+  section { display:none; padding:16px 16px 8px; max-width:560px; margin:0 auto; }
   section.on { display:block; }
-  h2 { margin:4px 0 12px; font-size:20px; }
-  .btn { display:inline-block; border:0; border-radius:12px; padding:12px 16px; font-size:16px; font-weight:600;
-         background:var(--card); color:var(--text); border:1px solid var(--line); }
-  .btn.primary { background:var(--yeni); border-color:var(--yeni); }
-  .btn.small { padding:8px 12px; font-size:14px; }
+  h1, h2, h3 { font-family:var(--cond); font-weight:800; letter-spacing:.01em; margin:0; line-height:1; }
+  h1 { font-size:34px; }
+  h2 { font-size:22px; margin:26px 0 10px; }
+  h3 { font-size:15px; font-weight:700; color:var(--turf); margin:16px 0 8px; }
+  .sub { color:var(--turf); font-size:14px; }
+  .head { display:flex; justify-content:space-between; align-items:flex-end; margin:6px 0 14px; }
+
+  /* Alt menü */
+  nav { position:fixed; left:0; right:0; bottom:0; z-index:20; display:flex; background:var(--deep);
+        border-top:1px solid var(--line); padding-bottom:env(safe-area-inset-bottom); }
+  nav button { flex:1; background:none; border:0; padding:9px 0 10px; color:var(--turf); font-size:12px; font-weight:600; }
+  nav svg { display:block; margin:0 auto 3px; width:24px; height:24px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  nav button.on { color:var(--chalk); }
+  nav button.on svg { stroke:var(--yellow); }
+
+  /* Butonlar */
+  .btn { border:1.5px solid var(--line); background:rgba(0,0,0,.22); border-radius:10px; padding:11px 15px; font-weight:600; font-size:15px; }
+  .btn.go { white-space:nowrap; background:var(--chalk); color:var(--pitch); border-color:var(--chalk); font-family:var(--cond); font-size:20px; font-weight:800; padding:10px 22px; }
+  .btn.go.live { background:transparent; color:var(--chalk); }
+  .btn.full { width:100%; }
   .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-  input[type=text], textarea, input[type=search] { width:100%; background:var(--card); color:var(--text); border:1px solid var(--line);
-         border-radius:10px; padding:12px; font-size:17px; font-family:inherit; }
-  textarea { min-height:70px; }
-  .mute { color:var(--mute); font-size:13px; }
+  input[type=text], input[type=search], textarea {
+    width:100%; background:rgba(0,0,0,.28); color:var(--chalk); border:1.5px solid var(--line); border-radius:10px;
+    padding:12px 14px; font:500 17px var(--body);
+  }
+  input::placeholder, textarea::placeholder { color:var(--turf); opacity:.8; }
+  textarea { min-height:64px; resize:vertical; }
 
-  /* Tarama */
-  #camWrap { position:relative; width:100%; border-radius:12px; overflow:hidden; background:#000; touch-action:none; }
-  #video { display:block; width:100%; height:auto; }
-  #roi { position:absolute; border:2px dashed #ffd400; box-shadow:0 0 0 9999px rgba(0,0,0,.35); pointer-events:none; display:none; }
-  #camHint { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; padding:20px; color:var(--mute); }
-  #status { margin:12px 0; padding:16px; border-radius:14px; background:var(--card); border:2px solid var(--line); min-height:96px; }
-  #status .nick { font-size:26px; font-weight:800; word-break:break-all; }
-  #status .tag { font-size:18px; font-weight:700; margin-top:4px; }
-  #status .note { margin-top:6px; color:#d6d9df; }
-  #status.toxic { border-color:var(--toxic); background:#3a1214; }
-  #status.iyi { border-color:var(--iyi); background:#3a2a08; }
-  #status.kolay { border-color:var(--kolay); background:#0d2c1f; }
-  #status.normal { border-color:var(--normal); }
-  #status.yeni { border-color:var(--yeni); background:#10213a; }
-  #raw { white-space:pre-wrap; font-size:11px; color:var(--mute); background:#0a0b0e; padding:8px; border-radius:8px; max-height:160px; overflow:auto; display:none; }
+  /* Kamera: saha köşesi gibi tebeşir çizgili çerçeve */
+  #camWrap { position:relative; border-radius:6px; overflow:hidden; background:#000; touch-action:none;
+             outline:2px solid var(--chalk); outline-offset:4px; margin:4px 4px 0; }
+  #camWrap::after { content:''; position:absolute; right:-40px; bottom:-40px; width:80px; height:80px; border:2px solid var(--chalk);
+             border-radius:50%; opacity:.6; pointer-events:none; }
+  #video { display:block; width:100%; height:auto; min-height:180px; }
+  #roi { position:absolute; border:2px dashed var(--yellow); box-shadow:0 0 0 9999px rgba(0,0,0,.4); pointer-events:none; display:none; border-radius:4px; }
+  #camHint { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; padding:24px; color:var(--turf); font-size:15px; }
+  .camBar { display:flex; justify-content:space-between; align-items:center; margin:16px 0 4px; gap:8px; }
+  .camTools { display:flex; gap:6px; }
+  .tool { white-space:nowrap; background:none; border:0; color:var(--turf); font-size:14px; font-weight:600; padding:8px 6px; }
+  .tool.on { color:var(--yellow); }
+  #perf { font-size:12px; color:var(--turf); min-height:18px; margin-top:4px; }
 
-  /* Tam ekran uyarı */
+  /* Hakem kartı */
+  .card { flex:none; width:58px; height:80px; border-radius:6px; transform:rotate(-7deg);
+          box-shadow:0 6px 0 rgba(0,0,0,.25); display:flex; align-items:center; justify-content:center;
+          font-family:var(--cond); font-weight:800; font-size:30px; }
+  .card.kacin { background:var(--red); color:#fff; }
+  .card.dikkat { background:var(--yellow); color:#2a2100; }
+  .card.ok { background:var(--white); color:var(--pitch); }
+  .card.yeni { background:transparent; border:2.5px dashed var(--new); color:var(--new); box-shadow:none; }
+  .card.bos { background:transparent; border:2px dashed var(--line); box-shadow:none; transform:none; }
+  .card.mini { width:14px; height:20px; border-radius:2.5px; transform:rotate(-7deg); box-shadow:none; }
+
+  /* Rapor (tarama ekranı) */
+  #report { display:flex; gap:18px; align-items:flex-start; margin-top:20px; padding:18px 4px 4px; border-top:1px solid var(--line); }
+  #report .info { min-width:0; flex:1; }
+  #report .nick { font-family:var(--cond); font-weight:800; font-size:34px; line-height:.95; overflow-wrap:anywhere; }
+  #report .verdict { font-weight:600; margin-top:6px; font-size:16px; }
+  #report .note { margin-top:8px; color:var(--chalk); opacity:.9; font-size:15px; }
+  #report .meta { margin-top:8px; color:var(--turf); font-size:13px; }
+  .v-kacin { color:#ff6b72; } .v-dikkat { color:var(--yellow); } .v-ok { color:var(--chalk); } .v-yeni { color:var(--new); }
+  .traits { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+  .trait { font-size:13px; font-weight:600; padding:3px 9px; border-radius:999px; background:rgba(0,0,0,.3); border:1px solid var(--line); }
+  .trait.neg { border-color:rgba(224,38,47,.55); }
+  .trait.pos { border-color:rgba(242,245,239,.5); }
+  .reportActions { display:flex; gap:8px; margin-top:16px; }
+  .reportActions .btn { flex:1; }
+  #raw { white-space:pre-wrap; font:11px/1.35 ui-monospace,monospace; color:var(--turf); background:rgba(0,0,0,.4); padding:10px; border-radius:8px; max-height:170px; overflow:auto; display:none; margin-top:14px; }
+
+  /* Tam ekran kart uyarısı */
   #flash { position:fixed; inset:0; z-index:50; display:none; flex-direction:column; align-items:center; justify-content:center;
-           text-align:center; padding:24px; font-weight:800; }
-  #flash .big { font-size:44px; line-height:1.1; }
-  #flash .nick { font-size:28px; margin-top:16px; word-break:break-all; }
-  #flash .note { font-size:18px; font-weight:500; margin-top:12px; opacity:.9; }
-  #flash .hint { position:absolute; bottom:calc(30px + env(safe-area-inset-bottom)); font-size:14px; font-weight:500; opacity:.7; }
-  #flash.toxic { background:var(--toxic); animation:pulse .6s ease-in-out 4; }
-  #flash.iyi { background:var(--iyi); color:#1b1300; }
-  #flash.kolay { background:var(--kolay); }
-  #flash.normal { background:#3b3f47; }
-  #flash.yeni { background:var(--yeni); }
-  @keyframes pulse { 50% { filter:brightness(1.6); } }
+           padding:24px; text-align:center; background:rgba(6,18,13,.94); }
+  #flash .bigcard { width:min(56vw,240px); aspect-ratio:5/7; border-radius:14px; display:flex; align-items:center; justify-content:center;
+           font-family:var(--cond); font-weight:800; font-size:min(18vw,84px); transform:rotate(-6deg); box-shadow:0 18px 0 rgba(0,0,0,.35);
+           animation:show .45s cubic-bezier(.2,1.4,.4,1) both; }
+  #flash.kacin .bigcard { background:var(--red); color:#fff; }
+  #flash.dikkat .bigcard { background:var(--yellow); color:#2a2100; }
+  #flash.ok .bigcard { background:var(--white); color:var(--pitch); }
+  #flash.yeni .bigcard { background:transparent; border:4px dashed var(--new); color:var(--new); box-shadow:none; }
+  #flash.kacin { background:#3a0a0e; }
+  #flash .title { font-family:var(--cond); font-weight:800; font-size:44px; line-height:1; margin-top:34px; }
+  #flash .nick { font-family:var(--cond); font-weight:700; font-size:28px; margin-top:8px; word-break:break-all; opacity:.95; }
+  #flash .traits { justify-content:center; margin-top:14px; }
+  #flash .trait { font-size:15px; }
+  #flash .note { margin-top:12px; font-size:17px; max-width:30ch; }
+  #flash .hint { position:absolute; bottom:calc(28px + env(safe-area-inset-bottom)); color:var(--turf); font-size:14px; }
+  @keyframes show { from { transform:rotate(-40deg) translateY(60px) scale(.6); opacity:0; } to { transform:rotate(-6deg); opacity:1; } }
+  @media (prefers-reduced-motion: reduce) { #flash .bigcard { animation:none; } }
 
-  /* Etiket butonları */
-  .tags { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0; }
-  .tags button { border:2px solid transparent; border-radius:14px; padding:20px 8px; font-size:18px; font-weight:800; color:#fff; }
-  .tags button[data-tag=toxic] { background:var(--toxic); }
-  .tags button[data-tag=iyi] { background:var(--iyi); color:#1b1300; }
-  .tags button[data-tag=kolay] { background:var(--kolay); }
-  .tags button[data-tag=normal] { background:#3b3f47; }
-  .tags button.sel { border-color:#fff; box-shadow:0 0 0 3px rgba(255,255,255,.35); transform:scale(1.02); }
-  .chips { display:flex; gap:6px; flex-wrap:wrap; margin:8px 0; }
-  .chip { background:var(--card); border:1px solid var(--line); color:var(--text); border-radius:999px; padding:6px 12px; font-size:14px; }
-  .chip.on { background:var(--text); color:var(--bg); }
+  /* Maç sonu */
+  .verdicts { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:6px; }
+  .verdicts button { border:2px solid transparent; background:rgba(0,0,0,.25); border-radius:12px; padding:14px 6px 12px;
+                     display:flex; flex-direction:column; align-items:center; gap:10px; font-weight:600; font-size:15px; }
+  .verdicts .card { width:40px; height:56px; font-size:0; }
+  .verdicts button.sel { border-color:var(--chalk); background:rgba(242,245,239,.08); }
+  .seg { display:grid; grid-template-columns:repeat(4,1fr); border:1.5px solid var(--line); border-radius:10px; overflow:hidden; }
+  .seg button { background:none; border:0; border-left:1.5px solid var(--line); padding:11px 2px; font-weight:600; font-size:14px; color:var(--turf); }
+  .seg button:first-child { border-left:0; }
+  .seg button.sel { background:var(--chalk); color:var(--pitch); }
+  .chips { display:flex; flex-wrap:wrap; gap:7px; }
+  .chip { background:rgba(0,0,0,.25); border:1.5px solid var(--line); border-radius:999px; padding:7px 13px; font-size:14px; font-weight:600; }
+  .chip.sel { background:var(--chalk); color:var(--pitch); border-color:var(--chalk); }
+  .chip.sel.neg { background:var(--red); color:#fff; border-color:var(--red); }
+  #rateInfo { margin-top:6px; color:var(--turf); font-size:14px; min-height:20px; }
+  .saveBar { position:sticky; bottom:calc(84px + env(safe-area-inset-bottom)); margin-top:22px; }
+  .saveBar .btn { box-shadow:0 8px 24px rgba(0,0,0,.4); }
 
   /* Liste */
-  .item { display:flex; gap:10px; align-items:flex-start; padding:12px; border-bottom:1px solid var(--line); }
-  .dot { width:14px; height:14px; border-radius:50%; margin-top:5px; flex:none; }
+  .filters { display:flex; gap:7px; overflow-x:auto; margin:12px -16px 4px; padding:0 16px 4px; scrollbar-width:none; }
+  .filters .chip { white-space:nowrap; display:flex; align-items:center; gap:7px; }
+  .item { display:flex; gap:14px; align-items:flex-start; padding:14px 2px; border-bottom:1px solid var(--line); }
+  .item .card { width:22px; height:30px; margin-top:3px; transform:rotate(-7deg); box-shadow:none; }
   .item .main { flex:1; min-width:0; }
-  .item .n { font-weight:700; font-size:17px; word-break:break-all; }
-  .item .del { background:none; border:0; color:var(--mute); font-size:20px; padding:0 4px; }
-  label.sw { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--line); }
-  #toast { position:fixed; left:50%; bottom:calc(80px + env(safe-area-inset-bottom)); transform:translateX(-50%); background:#fff; color:#000;
-           padding:10px 16px; border-radius:999px; font-weight:600; display:none; z-index:60; }
+  .item .n { font-family:var(--cond); font-weight:700; font-size:22px; line-height:1.05; word-break:break-all; }
+  .item .m { color:var(--turf); font-size:13px; margin-top:2px; }
+  .item .traits { margin-top:6px; }
+  .item .trait { font-size:12px; padding:2px 8px; }
+  .item .del { background:none; border:0; color:var(--turf); padding:4px 6px; font-size:13px; font-weight:600; }
+  .empty { text-align:center; padding:40px 10px; color:var(--turf); }
+  .empty .card { margin:0 auto 16px; }
+
+  /* Ayarlar */
+  .acc { display:flex; align-items:center; gap:12px; padding:12px 2px; border-bottom:1px solid var(--line); }
+  .acc .n { flex:1; font-family:var(--cond); font-weight:700; font-size:21px; word-break:break-all; }
+  .acc .badge { font-size:12px; color:var(--turf); }
+  .acc button { background:none; border:0; color:var(--turf); font-weight:600; font-size:14px; }
+  .addAcc { display:flex; gap:8px; margin-top:12px; }
+  .addAcc input { flex:1; }
+  label.sw { display:flex; justify-content:space-between; align-items:center; gap:16px; padding:14px 2px; border-bottom:1px solid var(--line); font-weight:500; }
+  label.sw small { display:block; color:var(--turf); font-weight:400; font-size:13px; }
+  label.sw input { width:22px; height:22px; accent-color:var(--yellow); flex:none; }
+
+  #toast { position:fixed; left:50%; bottom:calc(92px + env(safe-area-inset-bottom)); transform:translateX(-50%); background:var(--chalk); color:var(--pitch);
+           padding:10px 18px; border-radius:999px; font-weight:600; display:none; z-index:60; max-width:90vw; text-align:center; }
 </style>
 </head>
 <body>
 
 <!-- TARAMA -->
 <section id="v-scan" class="on">
+  <div class="head"><h1>Rakip Radar</h1><span class="sub" id="accLine"></span></div>
   <div id="camWrap">
     <video id="video" playsinline muted autoplay></video>
     <div id="roi"></div>
-    <div id="camHint">Telefonu ekrana doğru yerleştir ve <b>&nbsp;Başlat&nbsp;</b>'a dokun.</div>
+    <div id="camHint">Telefonu ekrana çevir ve taramayı başlat. PS menüsündeki maç kartı kadrajda olsun.</div>
   </div>
-  <div class="row" style="margin-top:10px">
-    <button class="btn primary" id="startBtn">▶ Başlat</button>
-    <button class="btn small" id="roiBtn">⬚ Bölge seç</button>
-    <button class="btn small" id="roiClear">Tüm ekran</button>
+  <div class="camBar">
+    <button class="btn go" id="startBtn">Taramayı başlat</button>
+    <div class="camTools">
+      <button class="tool" id="roiBtn">Bölge çiz</button>
+      <button class="tool" id="roiClear">Tüm ekran</button>
+    </div>
   </div>
-  <div id="status"><div class="mute">Henüz rakip okunmadı.</div></div>
-  <div class="row">
-    <button class="btn small" id="fixBtn">✏️ İsmi düzelt</button>
-    <button class="btn small" id="rateNowBtn">🏁 Maç bitti, etiketle</button>
+  <div id="perf"></div>
+  <div id="report"></div>
+  <div class="reportActions">
+    <button class="btn" id="fixBtn">İsmi düzelt</button>
+    <button class="btn" id="rateNowBtn" style="border-color:var(--chalk)">Maç bitti, değerlendir</button>
   </div>
-  <p class="mute" id="perf"></p>
   <div id="raw"></div>
 </section>
 
 <!-- MAÇ SONU -->
 <section id="v-rate">
-  <h2>Maç sonu</h2>
-  <div class="mute">Rakip</div>
-  <input type="text" id="rateNick" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="rakibin nicki">
-  <div id="rateInfo" class="mute" style="margin-top:6px"></div>
-  <div class="tags">
-    <button data-tag="toxic">🔴 Toxic</button>
-    <button data-tag="iyi">🟡 Çok iyi</button>
-    <button data-tag="kolay">🟢 Kolay</button>
-    <button data-tag="normal">⚪ Normal</button>
+  <div class="head"><h1>Maç sonu</h1></div>
+  <input type="text" id="rateNick" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Rakibin PSN adı">
+  <div id="rateInfo"></div>
+
+  <h2>Kartı</h2>
+  <div class="verdicts" id="verdicts">
+    <button data-v="kacin"><span class="card kacin"></span>Kaçın</button>
+    <button data-v="dikkat"><span class="card dikkat"></span>Dikkat</button>
+    <button data-v="ok"><span class="card ok"></span>Sorun yok</button>
   </div>
-  <textarea id="rateNote" placeholder="Not (isteğe bağlı): ör. sürekli pas yapıp oyalıyor"></textarea>
-  <div class="row" style="margin-top:10px">
-    <button class="btn primary" id="saveBtn" style="flex:1">💾 Kaydet</button>
-  </div>
-  <p class="mute" style="margin-top:18px">Son okunan rakipler</p>
+
+  <h2>Seviyesi</h2>
+  <div class="seg" id="levels"></div>
+
+  <h2>Neler yaptı?</h2>
+  <div id="traitGroups"></div>
+
+  <h2>Not</h2>
+  <textarea id="rateNote" placeholder="İsteğe bağlı, ör. 85. dakikada 3-0 öndeyken kaleciyle pas yaptı"></textarea>
+
+  <div class="saveBar"><button class="btn go full" id="saveBtn">Kaydet</button></div>
+
+  <h3 style="margin-top:28px">Son okunan rakipler</h3>
   <div class="chips" id="recent"></div>
 </section>
 
 <!-- LİSTE -->
 <section id="v-list">
-  <h2>Rakip listesi <span class="mute" id="count"></span></h2>
-  <input type="search" id="q" placeholder="Ara…" autocapitalize="off" spellcheck="false">
-  <div class="chips" id="filters">
-    <button class="chip on" data-f="">Hepsi</button>
-    <button class="chip" data-f="toxic">🔴 Toxic</button>
-    <button class="chip" data-f="iyi">🟡 Çok iyi</button>
-    <button class="chip" data-f="kolay">🟢 Kolay</button>
-    <button class="chip" data-f="normal">⚪ Normal</button>
-  </div>
+  <div class="head"><h1>Rakipler</h1><span class="sub" id="count"></span></div>
+  <input type="search" id="q" placeholder="İsimle ara" autocapitalize="off" spellcheck="false">
+  <div class="filters" id="filters"></div>
   <div id="list"></div>
 </section>
 
 <!-- AYARLAR -->
 <section id="v-set">
-  <h2>Ayarlar</h2>
-  <div class="mute">Kendi PSN adın (rakip sanılmasın diye)</div>
-  <input type="text" id="ownNick" autocomplete="off" autocapitalize="off" spellcheck="false">
-  <label class="sw">Renkleri ters çevir (koyu ekran için önerilir) <input type="checkbox" id="invert"></label>
-  <label class="sw">Ses uyarısı <input type="checkbox" id="sound"></label>
-  <label class="sw">Okunan ham metni göster (ayar/test için) <input type="checkbox" id="debug"></label>
-  <h2 style="margin-top:22px">Yedek</h2>
-  <p class="mute">Liste sadece bu telefonda saklanır. Arada bir yedek al.</p>
-  <div class="row">
-    <button class="btn" id="exportBtn">⬆️ Yedek al</button>
-    <button class="btn" id="importBtn">⬇️ Yedekten yükle</button>
-    <input type="file" id="importFile" accept="application/json,.json" style="display:none">
+  <div class="head"><h1>Ayarlar</h1></div>
+  <h2 style="margin-top:20px">Hesaplarım</h2>
+  <p class="sub" style="margin:0 0 4px">Bu isimler ekranda görülse de rakip sayılmaz.</p>
+  <div id="accounts"></div>
+  <div class="addAcc">
+    <input type="text" id="newAcc" placeholder="PSN adı ekle" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <button class="btn" id="addAccBtn">Ekle</button>
   </div>
-  <p class="mute" style="margin-top:24px">Rakip Radar · sürüm <span id="ver"></span></p>
+
+  <h2>Tarama</h2>
+  <label class="sw"><span>Renkleri ters çevir<small>Koyu PS ekranlarında okumayı iyileştirir</small></span><input type="checkbox" id="invert"></label>
+  <label class="sw"><span>Sesli uyarı<small>Telefon sessizdeyse çalmayabilir</small></span><input type="checkbox" id="sound"></label>
+  <label class="sw"><span>Okunan metni göster<small>Okuma sorunlarını incelemek için</small></span><input type="checkbox" id="debug"></label>
+
+  <h2>Yedek</h2>
+  <p class="sub" style="margin:0 0 12px">Liste yalnızca bu telefonda duruyor. Uygulamayı silmeden önce yedek al.</p>
+  <div class="row">
+    <button class="btn" id="exportBtn">Yedek al</button>
+    <button class="btn" id="importBtn">Yedekten yükle</button>
+    <input type="file" id="importFile" accept="application/json,.json" hidden>
+  </div>
+  <p class="sub" style="margin-top:30px">Sürüm <span id="ver"></span></p>
 </section>
 
-<div id="flash"><div class="big"></div><div class="nick"></div><div class="note"></div><div class="hint">Kapatmak için dokun</div></div>
-<div id="toast"></div>
+<div id="flash" role="alert">
+  <div class="bigcard"></div>
+  <div class="title"></div>
+  <div class="nick"></div>
+  <div class="traits"></div>
+  <div class="note"></div>
+  <div class="hint">Kapatmak için dokun</div>
+</div>
+<div id="toast" role="status"></div>
 
 <nav>
-  <button data-v="scan" class="on"><b>📷</b>Tara</button>
-  <button data-v="rate"><b>🏁</b>Maç sonu</button>
-  <button data-v="list"><b>📋</b>Liste</button>
-  <button data-v="set"><b>⚙️</b>Ayarlar</button>
+  <button data-v="scan" class="on"><svg viewBox="0 0 24 24"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M8 12h8"/></svg>Tara</button>
+  <button data-v="rate"><svg viewBox="0 0 24 24"><rect x="7" y="3" width="11" height="16" rx="2" transform="rotate(-8 12 11)"/></svg>Maç sonu</button>
+  <button data-v="list"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6h.01M4 12h.01M4 18h.01" stroke-width="3"/></svg>Rakipler</button>
+  <button data-v="set"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>Ayarlar</button>
 </nav>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script src="core.js"></script>
 <script>
 'use strict';
-const VERSION = '1.0';
+const VERSION = '2.0';
 const $ = s => document.querySelector(s);
-const TAGS = {
-  toxic:  { label: 'TOXIC',          big: '🔴 TOXIC!<br>GİRME',        color: 'var(--toxic)' },
-  iyi:    { label: 'Çok iyi oyuncu', big: '🟡 ÇOK İYİ OYUNCU',         color: 'var(--iyi)' },
-  kolay:  { label: 'Kolay rakip',    big: '🟢 KOLAY RAKİP',            color: 'var(--kolay)' },
-  normal: { label: 'Normal',         big: '⚪ NORMAL',                 color: 'var(--normal)' },
+const $$ = s => [...document.querySelectorAll(s)];
+
+/* ---------- Kategoriler ---------- */
+const VERDICTS = {
+  kacin: { label: 'Kaçın',     flash: 'Girme',         glyph: '' },
+  dikkat:{ label: 'Dikkat',    flash: 'Dikkatli ol',   glyph: '' },
+  ok:    { label: 'Sorun yok', flash: 'Sorun yok',     glyph: '' },
+  yeni:  { label: 'Yeni rakip, kaydı yok', flash: 'Yeni rakip', glyph: '?' },
 };
+const LEVELS = {
+  bot:  'Bot',
+  orta: 'Orta',
+  iyi:  'İyi',
+  ter:  'Ter / Pro',
+};
+// neg: kötü davranış (kırmızı vurgulanır), pos: olumlu
+const TRAITS = [
+  { g: 'Davranış', items: [
+    ['toxic', 'Toxic', 'neg'], ['tekrar', 'Tekrar / kutlama izletir', 'neg'], ['pause', 'Pause abuse', 'neg'],
+    ['oyalama', 'Top saklar, oyalar', 'neg'], ['quit', 'Rage quit', 'neg'], ['bekletir', 'Lobide bekletir', 'neg'],
+    ['centilmen', 'Centilmen', 'pos'] ] },
+  { g: 'Oyun tarzı', items: [
+    ['meta', 'Meta abuser', 'neg'], ['skill', 'Skill move spam', 'neg'], ['orta', 'Orta / kafa spam', ''],
+    ['otobus', 'Otobüs çeker', 'neg'], ['pres', 'Ağır pres', ''], ['kontra', 'Kontra / uzun top', ''],
+    ['pasoyunu', 'Pas oyunu', 'pos'] ] },
+  { g: 'Kadro ve bağlantı', items: [
+    ['kadro', 'Uçuk kadro', ''], ['lag', 'Lag / delay', 'neg'] ] },
+];
+const TRAIT = {}; TRAITS.forEach(g => g.items.forEach(([id, label, pol]) => TRAIT[id] = { label, pol }));
 $('#ver').textContent = VERSION;
 
-/* ---------- Kayıt (telefon hafızası) ---------- */
+/* ---------- Kayıt ---------- */
 const store = {
   get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
-  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { toast('Kaydedilemedi!'); } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { toast('Kaydedilemedi: telefon hafızası dolu olabilir'); } },
 };
-let db = store.get('rr_db', {});            // key -> kayıt
-let settings = Object.assign({ own: 'Albirtcamus', invert: true, sound: true, debug: false, roi: null }, store.get('rr_settings', {}));
-let current = store.get('rr_current', null); // son rakip {nick, key, time}
-let recent = store.get('rr_recent', []);     // son 15 rakip
+let db = store.get('rr_db', {});
+let settings = Object.assign({ owns: null, own: 'Albirtcamus', invert: true, sound: true, debug: false, roi: null }, store.get('rr_settings', {}));
+if (!Array.isArray(settings.owns)) settings.owns = settings.own ? [settings.own] : [];
+let current = store.get('rr_current', null);
+let recent = store.get('rr_recent', []);
 const saveDb = () => store.set('rr_db', db);
 const saveSettings = () => store.set('rr_settings', settings);
 const dbArr = () => Object.values(db);
 
-function toast(msg) { const t = $('#toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(toast.t); toast.t = setTimeout(() => t.style.display = 'none', 1800); }
+// v1 kayıtlarını yeni yapıya çevir
+(function migrate() {
+  const map = { toxic: ['kacin', null, ['toxic']], iyi: ['dikkat', 'iyi', []], kolay: ['ok', 'bot', []], normal: ['ok', 'orta', []] };
+  let changed = false;
+  for (const r of dbArr()) {
+    if (!r.verdict && r.tag) { const m = map[r.tag] || ['ok', null, []]; r.verdict = m[0]; r.level = m[1]; r.traits = m[2]; delete r.tag; changed = true; }
+    if (!r.traits) r.traits = []; if (!r.aliases) r.aliases = [];
+  }
+  if (changed) saveDb();
+})();
+
+// Eşleştirme için tüm isimler + öğrenilmiş yanlış okumalar
+function entries() {
+  const out = [];
+  for (const r of dbArr()) { out.push({ key: r.key, main: r.key }); for (const a of r.aliases || []) out.push({ key: a, main: r.key }); }
+  return out;
+}
+
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(toast.t); toast.t = setTimeout(() => t.style.display = 'none', 2000); }
 function esc(s) { return String(s || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
-function fmtDate(t) { return t ? new Date(t).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }) : ''; }
+function fmtDate(t) { return t ? new Date(t).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' }) : ''; }
+function traitHtml(list) {
+  return (list || []).filter(id => TRAIT[id]).map(id => `<span class="trait ${TRAIT[id].pol}">${esc(TRAIT[id].label)}</span>`).join('');
+}
 
 /* ---------- Sekmeler ---------- */
 let view = 'scan';
-document.querySelectorAll('nav button').forEach(b => b.onclick = () => show(b.dataset.v));
-function show(v) {
+$$('nav button').forEach(b => b.onclick = () => show(b.dataset.v));
+function show(v, opts) {
   view = v;
-  document.querySelectorAll('section').forEach(s => s.classList.toggle('on', s.id === 'v-' + v));
-  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  $$('section').forEach(s => s.classList.toggle('on', s.id === 'v-' + v));
+  $$('nav button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
   if (v === 'list') renderList();
-  if (v === 'rate') openRate();
+  if (v === 'rate') openRate(opts);
+  if (v === 'set') renderAccounts();
   window.scrollTo(0, 0);
 }
 
@@ -224,15 +371,15 @@ function beep(pattern) {
   for (const [freq, dur] of pattern) {
     const o = actx.createOscillator(), g = actx.createGain();
     o.frequency.value = freq; o.type = 'square';
-    g.gain.setValueAtTime(0.25, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    g.gain.setValueAtTime(0.22, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
     o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t + dur);
-    t += dur + 0.08;
+    t += dur + 0.07;
   }
 }
-const SOUNDS = { toxic: [[1200, .18], [1200, .18], [1200, .18], [900, .4]], iyi: [[800, .15], [1000, .2]], kolay: [[600, .25]], normal: [[500, .12]], yeni: [[700, .1]] };
-function vibrate(p) { if (navigator.vibrate) navigator.vibrate(p); }
+// Kırmızı kart: hakem düdüğü gibi üç uzun ses
+const SOUNDS = { kacin: [[2100, .22], [2100, .22], [2100, .5]], dikkat: [[1500, .16], [1500, .16]], ok: [[900, .14]], yeni: [[700, .1], [1000, .1]] };
 
-/* ---------- Kamera ---------- */
+/* ---------- Kamera ve okuma ---------- */
 const video = $('#video');
 let stream = null, scanning = false, worker = null, wakeLock = null;
 
@@ -246,7 +393,8 @@ $('#startBtn').onclick = async () => {
 };
 
 async function startScan() {
-  $('#startBtn').disabled = true;
+  const btn = $('#startBtn');
+  btn.disabled = true;
   try {
     if (!stream) {
       $('#camHint').textContent = 'Kamera açılıyor…';
@@ -256,32 +404,33 @@ async function startScan() {
     }
     $('#camHint').style.display = 'none';
     if (!worker) {
-      if (typeof Tesseract === 'undefined') throw new Error('Yazı tanıma kütüphanesi yüklenemedi. İnternet bağlantını kontrol edip uygulamayı yeniden aç');
-      $('#perf').textContent = 'Yazı tanıma yükleniyor… (ilk açılışta birkaç saniye sürebilir)';
+      if (typeof Tesseract === 'undefined') throw new Error('Yazı tanıma yüklenemedi. İnternete bağlanıp uygulamayı yeniden aç');
+      $('#perf').textContent = 'Yazı tanıma hazırlanıyor. İlk açılışta birkaç saniye sürer.';
       worker = await Tesseract.createWorker('eng', 1, {
-        logger: m => { if (m.status && m.progress < 1) $('#perf').textContent = 'Yükleniyor: ' + m.status + ' ' + Math.round(m.progress * 100) + '%'; }
+        logger: m => { if (m.status && m.progress < 1) $('#perf').textContent = 'Hazırlanıyor: %' + Math.round(m.progress * 100); }
       });
       await worker.setParameters({ tessedit_pageseg_mode: '11' });
     }
     scanning = true;
-    $('#startBtn').textContent = '⏸ Durdur';
+    btn.textContent = 'Taramayı durdur'; btn.classList.add('live');
     drawRoi();
     try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {}
     loop();
   } catch (e) {
-    $('#camHint').style.display = 'flex';
     const msg = String(e.message || e);
-    $('#camHint').textContent = /yazı tanıma/i.test(msg) ? msg + '.' : 'Kamera açılamadı: ' + msg + '. Ayarlar > Safari > Kamera iznini kontrol et.';
+    $('#camHint').style.display = 'flex';
+    $('#camHint').textContent = /yazı tanıma/i.test(msg) ? msg + '.' : 'Kamera açılamadı. iPhone Ayarlar > Safari > Kamera bölümünden izin ver. (' + msg + ')';
+    $('#perf').textContent = '';
   }
-  $('#startBtn').disabled = false;
+  btn.disabled = false;
 }
 
 function stopScan() {
   scanning = false;
-  $('#startBtn').textContent = '▶ Başlat';
+  const btn = $('#startBtn'); btn.textContent = 'Taramayı başlat'; btn.classList.remove('live');
+  $('#perf').textContent = 'Tarama durdu.';
   if (wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; }
 }
-
 document.addEventListener('visibilitychange', async () => {
   if (!document.hidden && scanning && 'wakeLock' in navigator) { try { wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {} }
 });
@@ -290,30 +439,24 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const work = document.createElement('canvas');
 const wctx = work.getContext('2d', { willReadFrequently: true });
 
-// Kameradan bir kare al, seçili bölgeyi kes, gri + ters + kontrast uygula.
 function grabFrame() {
   const vw = video.videoWidth, vh = video.videoHeight;
   if (!vw) return null;
   let sx = 0, sy = 0, sw = vw, sh = vh;
   if (settings.roi) { sx = settings.roi.x * vw; sy = settings.roi.y * vh; sw = settings.roi.w * vw; sh = settings.roi.h * vh; }
-  let scale = 1280 / Math.max(sw, sh);
-  scale = Math.min(scale, 3);
+  const scale = Math.min(1280 / Math.max(sw, sh), 3);
   const W = Math.round(sw * scale), H = Math.round(sh * scale);
   work.width = W; work.height = H;
   wctx.drawImage(video, sx, sy, sw, sh, 0, 0, W, H);
   const img = wctx.getImageData(0, 0, W, H), d = img.data;
-  let min = 255, max = 0;
-  const g = new Uint8ClampedArray(W * H);
+  const g = new Uint8ClampedArray(W * H); let min = 255, max = 0;
   for (let i = 0, j = 0; i < d.length; i += 4, j++) {
-    let v = (d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114);
+    let v = d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114;
     if (settings.invert) v = 255 - v;
     g[j] = v; if (v < min) min = v; if (v > max) max = v;
   }
   const range = Math.max(1, max - min);
-  for (let i = 0, j = 0; i < d.length; i += 4, j++) {
-    const v = (g[j] - min) * 255 / range;
-    d[i] = d[i + 1] = d[i + 2] = v;
-  }
+  for (let i = 0, j = 0; i < d.length; i += 4, j++) { d[i] = d[i + 1] = d[i + 2] = (g[j] - min) * 255 / range; }
   wctx.putImageData(img, 0, 0);
   return work;
 }
@@ -324,114 +467,125 @@ async function loop() {
     const frame = grabFrame();
     if (!frame) { await sleep(200); continue; }
     const t0 = performance.now();
-    try {
-      const { data } = await worker.recognize(frame);
-      handleText(data.text || '');
-    } catch (e) { console.warn(e); }
-    const ms = Math.round(performance.now() - t0);
-    $('#perf').textContent = 'Okuma süresi: ' + ms + ' ms';
+    try { const { data } = await worker.recognize(frame); handleText(data.text || ''); } catch (e) { console.warn(e); }
+    $('#perf').textContent = 'Taranıyor · kare başına ' + Math.round(performance.now() - t0) + ' ms';
     await sleep(60);
   }
 }
 
-/* ---------- Okunan metni değerlendir ---------- */
-const hist = [];  // son kareler: {known, opp}
+const hist = [];
 function handleText(text) {
   if (settings.debug) { $('#raw').style.display = 'block'; $('#raw').textContent = text; } else $('#raw').style.display = 'none';
-  const known = Core.findKnown(text, dbArr(), settings.own);
-  const opp = Core.extractOpponent(text, settings.own);
-  hist.push({ known: known && known.rec.key, opp: opp && Core.normKey(opp), oppRaw: opp });
+  const known = Core.findKnown(text, entries(), settings.owns);
+  const opp = Core.extractOpponent(text, settings.owns);
+  hist.push({ known: known && known.rec.main, opp: opp && Core.normKey(opp), oppRaw: opp });
   if (hist.length > 4) hist.shift();
 
   if (known) {
-    const k = known.rec.key;
-    const hits = hist.filter(h => h.known === k).length;
-    if (known.score >= 0.92 || hits >= 2) return setOpponent(known.rec.nick, true);
+    const k = known.rec.main;
+    if (known.score >= 0.92 || hist.filter(h => h.known === k).length >= 2) return setOpponent(db[k].nick, opp);
   }
   if (opp) {
     const k = Core.normKey(opp);
-    const hits = hist.filter(h => h.opp && Core.score(h.opp, k) >= 0.85).length;
-    if (hits >= 2) {
-      // Birden fazla okumada en uzun/temiz hali seç
-      const best = hist.filter(h => h.opp && Core.score(h.opp, k) >= 0.85).map(h => h.oppRaw).sort((a, b) => b.length - a.length)[0];
-      return setOpponent(best || opp, false);
-    }
+    const same = hist.filter(h => h.opp && Core.score(h.opp, k) >= 0.85);
+    if (same.length >= 2) return setOpponent(same.map(h => h.oppRaw).sort((a, b) => b.length - a.length)[0] || opp, opp);
   }
 }
 
 function lookup(nick) {
   const k = Core.normKey(nick);
+  if (!k) return null;
   if (db[k]) return db[k];
   let best = null;
-  for (const r of dbArr()) { const s = Core.score(k, r.key); if (s >= Core.threshold(r.key.length) && (!best || s > best.s)) best = { r, s }; }
+  for (const e of entries()) { const s = Core.score(k, e.key); if (s >= Core.threshold(e.key.length) && (!best || s > best.s)) best = { r: db[e.main], s }; }
   return best ? best.r : null;
 }
 
-function setOpponent(nick, fromDb) {
+function setOpponent(nick, rawRead) {
   const rec = lookup(nick);
   const name = rec ? rec.nick : nick;
   const key = Core.normKey(name);
   const same = current && Core.score(current.key, key) >= 0.85 && (Date.now() - current.time) < 10 * 60 * 1000;
-  current = { nick: name, key, time: Date.now() };
+  current = { nick: name, key, time: Date.now(), read: rawRead || nick };
   store.set('rr_current', current);
   recent = [current, ...recent.filter(r => Core.score(r.key, key) < 0.85)].slice(0, 15);
   store.set('rr_recent', recent);
-  renderStatus();
-  if (same) return;          // aynı rakip, tekrar alarm verme
-  const tag = rec ? rec.tag : 'yeni';
-  showFlash(tag, name, rec);
-  beep(SOUNDS[tag] || SOUNDS.yeni);
-  vibrate(tag === 'toxic' ? [300, 100, 300, 100, 300] : [150]);
+  renderReport();
+  if (same) return;
+  const v = rec ? rec.verdict : 'yeni';
+  showFlash(v, name, rec);
+  beep(SOUNDS[v]);
+  if (navigator.vibrate) navigator.vibrate(v === 'kacin' ? [300, 100, 300, 100, 300] : [150]);
 }
 
-function renderStatus() {
-  const box = $('#status');
-  box.className = '';
-  if (!current) { box.innerHTML = '<div class="mute">Henüz rakip okunmadı.</div>'; return; }
-  const rec = lookup(current.nick);
-  if (rec) {
-    box.classList.add(rec.tag);
-    box.innerHTML = `<div class="nick">${esc(rec.nick)}</div><div class="tag" style="color:${TAGS[rec.tag].color}">${TAGS[rec.tag].label}</div>` +
-      (rec.note ? `<div class="note">📝 ${esc(rec.note)}</div>` : '') +
-      `<div class="mute" style="margin-top:6px">${rec.count || 1} kez karşılaştınız · son: ${fmtDate(rec.last)}</div>`;
-  } else {
-    box.classList.add('yeni');
-    box.innerHTML = `<div class="nick">${esc(current.nick)}</div><div class="tag" style="color:#8fb6ff">Yeni rakip — listede kayıt yok</div>`;
+function renderReport() {
+  const box = $('#report');
+  if (!current) {
+    box.innerHTML = `<span class="card bos"></span><div class="info"><div class="nick" style="color:var(--turf)">Rakip bekleniyor</div>
+      <div class="meta">Okunan ilk isim burada görünecek.</div></div>`;
+    return;
   }
+  const r = lookup(current.nick);
+  if (!r) {
+    box.innerHTML = `<span class="card yeni">?</span><div class="info"><div class="nick">${esc(current.nick)}</div>
+      <div class="verdict v-yeni">Yeni rakip, kaydı yok</div></div>`;
+    return;
+  }
+  box.innerHTML = `<span class="card ${r.verdict}"></span><div class="info"><div class="nick">${esc(r.nick)}</div>
+    <div class="verdict v-${r.verdict}">${VERDICTS[r.verdict].label}${r.level ? ' · ' + LEVELS[r.level] : ''}</div>
+    <div class="traits">${traitHtml(r.traits)}</div>
+    ${r.note ? `<div class="note">“${esc(r.note)}”</div>` : ''}
+    <div class="meta">Daha önce ${r.count || 1} maç, sonuncusu ${fmtDate(r.last)}</div></div>`;
 }
 
-function showFlash(tag, name, rec) {
+function showFlash(v, name, rec) {
   const f = $('#flash');
-  f.className = tag;
-  f.querySelector('.big').innerHTML = rec ? TAGS[tag].big : '🆕 YENİ RAKİP';
+  f.className = v;
+  const card = f.querySelector('.bigcard');
+  card.textContent = VERDICTS[v].glyph;
+  card.style.animation = 'none'; void card.offsetWidth; card.style.animation = '';
+  f.querySelector('.title').textContent = VERDICTS[v].flash + (rec && rec.level ? ' · ' + LEVELS[rec.level] : '');
   f.querySelector('.nick').textContent = name;
-  f.querySelector('.note').textContent = rec && rec.note ? '📝 ' + rec.note : (rec ? '' : 'Listede kaydı yok');
+  f.querySelector('.traits').innerHTML = rec ? traitHtml(rec.traits) : '';
+  f.querySelector('.note').textContent = rec && rec.note ? '“' + rec.note + '”' : (rec ? '' : 'Bu rakiple daha önce oynamadın.');
   f.style.display = 'flex';
   clearTimeout(showFlash.t);
-  showFlash.t = setTimeout(() => f.style.display = 'none', tag === 'toxic' ? 8000 : 4000);
+  showFlash.t = setTimeout(() => f.style.display = 'none', v === 'kacin' ? 8000 : 4500);
 }
 $('#flash').onclick = () => $('#flash').style.display = 'none';
 
+// İsim düzeltme: yanlış okunan hali kayda "öğrenilmiş isim" olarak eklenir.
+let pendingAlias = null;
 $('#fixBtn').onclick = () => {
-  const v = prompt('Rakibin doğru nicki:', current ? current.nick : '');
-  if (v && v.trim()) { current = null; setOpponent(v.trim(), false); }
+  if (!current) return toast('Önce bir rakip okunmalı');
+  const v = prompt('Rakibin doğru PSN adı:', current.nick);
+  if (!v || !v.trim()) return;
+  const wrongKey = Core.normKey(current.read || current.nick);
+  const target = lookup(v.trim());
+  if (target) {
+    if (wrongKey && wrongKey !== target.key && !target.aliases.includes(wrongKey)) { target.aliases.push(wrongKey); saveDb(); toast('Öğrenildi: bu okuma artık ' + target.nick + ' sayılacak'); }
+  } else if (wrongKey && wrongKey !== Core.normKey(v)) pendingAlias = { nick: Core.normKey(v), wrong: wrongKey };
+  current = null;
+  setOpponent(v.trim(), v.trim());
 };
 $('#rateNowBtn').onclick = () => show('rate');
 
-/* ---------- Bölge seçimi (çerçeve) ---------- */
-let roiMode = false, roiStart = null;
+/* ---------- Bölge çizme ---------- */
+let roiMode = false, roiStart = null, roiTmp = null;
 const wrap = $('#camWrap');
-$('#roiBtn').onclick = () => { roiMode = true; toast('Parmağınla ismin olduğu alanı çiz'); };
-$('#roiClear').onclick = () => { settings.roi = null; saveSettings(); drawRoi(); toast('Tüm ekran okunuyor'); };
-function rel(e) { const r = wrap.getBoundingClientRect(); const p = e.touches ? e.touches[0] : e; return { x: Math.min(1, Math.max(0, (p.clientX - r.left) / r.width)), y: Math.min(1, Math.max(0, (p.clientY - r.top) / r.height)) }; }
-function roiFrom(a, b) { return { x: Math.min(a.x, b.x), y: Math.min(a.y, b.y), w: Math.abs(a.x - b.x), h: Math.abs(a.y - b.y) }; }
-let roiTmp = null;
+$('#roiBtn').onclick = () => { roiMode = true; $('#roiBtn').classList.add('on'); toast('Parmağınla isim kartının etrafını çiz'); };
+$('#roiClear').onclick = () => { settings.roi = null; saveSettings(); drawRoi(); toast('Tüm görüntü okunuyor'); };
+function rel(e) { const r = wrap.getBoundingClientRect(), p = e.touches ? e.touches[0] : e; return { x: Math.min(1, Math.max(0, (p.clientX - r.left) / r.width)), y: Math.min(1, Math.max(0, (p.clientY - r.top) / r.height)) }; }
 wrap.addEventListener('touchstart', e => { if (!roiMode) return; e.preventDefault(); roiStart = rel(e); }, { passive: false });
-wrap.addEventListener('touchmove', e => { if (!roiMode || !roiStart) return; e.preventDefault(); roiTmp = roiFrom(roiStart, rel(e)); drawRoi(roiTmp); }, { passive: false });
+wrap.addEventListener('touchmove', e => {
+  if (!roiMode || !roiStart) return; e.preventDefault();
+  const p = rel(e); roiTmp = { x: Math.min(roiStart.x, p.x), y: Math.min(roiStart.y, p.y), w: Math.abs(roiStart.x - p.x), h: Math.abs(roiStart.y - p.y) };
+  drawRoi(roiTmp);
+}, { passive: false });
 wrap.addEventListener('touchend', () => {
   if (!roiMode || !roiStart) return;
   if (roiTmp && roiTmp.w > 0.05 && roiTmp.h > 0.03) { settings.roi = roiTmp; saveSettings(); toast('Bölge kaydedildi'); }
-  roiMode = false; roiStart = null; roiTmp = null; drawRoi();
+  roiMode = false; roiStart = null; roiTmp = null; $('#roiBtn').classList.remove('on'); drawRoi();
 });
 function drawRoi(r) {
   r = r || settings.roi;
@@ -440,109 +594,148 @@ function drawRoi(r) {
   Object.assign(el.style, { display: 'block', left: r.x * 100 + '%', top: r.y * 100 + '%', width: r.w * 100 + '%', height: r.h * 100 + '%' });
 }
 
-/* ---------- Maç sonu / etiketleme ---------- */
-let selTag = null;
-document.querySelectorAll('.tags button').forEach(b => b.onclick = () => {
-  selTag = b.dataset.tag;
-  document.querySelectorAll('.tags button').forEach(x => x.classList.toggle('sel', x === b));
+/* ---------- Maç sonu ---------- */
+let sel = { verdict: null, level: null, traits: new Set() };
+$('#levels').innerHTML = Object.entries(LEVELS).map(([k, l]) => `<button data-l="${k}">${l}</button>`).join('');
+$('#traitGroups').innerHTML = TRAITS.map(g => `<h3>${g.g}</h3><div class="chips">` +
+  g.items.map(([id, label, pol]) => `<button class="chip ${pol}" data-t="${id}">${esc(label)}</button>`).join('') + '</div>').join('');
+
+$$('#verdicts button').forEach(b => b.onclick = () => { sel.verdict = sel.verdict === b.dataset.v ? null : b.dataset.v; sel.auto = false; paintSel(); });
+$$('#levels button').forEach(b => b.onclick = () => { sel.level = sel.level === b.dataset.l ? null : b.dataset.l; paintSel(); });
+$$('#traitGroups .chip').forEach(b => b.onclick = () => {
+  const t = b.dataset.t; sel.traits.has(t) ? sel.traits.delete(t) : sel.traits.add(t);
+  // Kötü davranış seçilince kartı öner; elle seçilmiş karta dokunmaz
+  if (sel.traits.has(t) && TRAIT[t].pol === 'neg' && (!sel.verdict || sel.auto)) {
+    const red = [...sel.traits].some(x => ['toxic', 'tekrar', 'pause', 'quit'].includes(x));
+    sel.verdict = red ? 'kacin' : 'dikkat'; sel.auto = true;
+  }
+  paintSel();
 });
+function paintSel() {
+  $$('#verdicts button').forEach(b => b.classList.toggle('sel', b.dataset.v === sel.verdict));
+  $$('#levels button').forEach(b => b.classList.toggle('sel', b.dataset.l === sel.level));
+  $$('#traitGroups .chip').forEach(b => b.classList.toggle('sel', sel.traits.has(b.dataset.t)));
+}
 function openRate(nick) {
-  const n = nick || (current && current.nick) || '';
-  $('#rateNick').value = n;
+  $('#rateNick').value = (typeof nick === 'string' && nick) || (current && current.nick) || '';
   fillRate();
-  $('#recent').innerHTML = recent.map(r => `<button class="chip" data-n="${esc(r.nick)}">${esc(r.nick)}</button>`).join('') || '<span class="mute">Yok</span>';
-  $('#recent').querySelectorAll('button').forEach(b => b.onclick = () => { $('#rateNick').value = b.dataset.n; fillRate(); });
+  $('#recent').innerHTML = recent.map(r => `<button class="chip" data-n="${esc(r.nick)}">${esc(r.nick)}</button>`).join('') || '<span class="sub">Henüz okunan rakip yok.</span>';
+  $$('#recent .chip').forEach(b => b.onclick = () => { $('#rateNick').value = b.dataset.n; fillRate(); window.scrollTo(0, 0); });
 }
 function fillRate() {
-  const rec = lookup($('#rateNick').value.trim());
-  selTag = rec ? rec.tag : null;
-  document.querySelectorAll('.tags button').forEach(x => x.classList.toggle('sel', x.dataset.tag === selTag));
-  $('#rateNote').value = rec ? (rec.note || '') : '';
-  $('#rateInfo').textContent = rec ? `Kayıtlı: ${TAGS[rec.tag].label} · ${rec.count || 1} maç · son ${fmtDate(rec.last)}` : ($('#rateNick').value ? 'Listede yok, yeni kayıt olacak.' : '');
+  const r = lookup($('#rateNick').value.trim());
+  sel = { verdict: r ? r.verdict : null, level: r ? r.level : null, traits: new Set(r ? r.traits : []) };
+  $('#rateNote').value = r ? (r.note || '') : '';
+  $('#rateInfo').textContent = r ? `Kayıtlı rakip: ${r.count || 1} maç oynadınız, son maç ${fmtDate(r.last)}.` : ($('#rateNick').value ? 'Listede yok, yeni kayıt açılacak.' : '');
+  paintSel();
 }
 $('#rateNick').addEventListener('input', fillRate);
 $('#saveBtn').onclick = () => {
   const nick = $('#rateNick').value.trim();
-  if (!nick) return toast('Önce rakibin nickini yaz');
-  if (!selTag) return toast('Bir etiket seç');
-  const note = $('#rateNote').value.trim();
-  const old = lookup(nick);
+  if (!nick) return toast('Rakibin adını yaz');
+  if (Core.isOwn(nick, settings.owns)) return toast('Bu senin hesaplarından biri');
+  if (!sel.verdict) return toast('Bir kart seç: Kaçın, Dikkat ya da Sorun yok');
+  const old = lookup(nick), now = Date.now();
   const key = old ? old.key : Core.normKey(nick);
-  const now = Date.now();
-  const rec = old || { nick, key, first: now, count: 0, history: [] };
-  if (old && old.nick !== nick && Core.normKey(nick) !== old.key) { /* benzer isim: eski kaydı kullan */ }
-  rec.nick = old ? old.nick : nick;
-  rec.tag = selTag; rec.note = note; rec.last = now; rec.count = (rec.count || 0) + 1;
-  rec.history = [...(rec.history || []), { tag: selTag, note, date: now }].slice(-20);
+  const rec = old || { nick, key, first: now, count: 0, history: [], aliases: [] };
+  Object.assign(rec, { verdict: sel.verdict, level: sel.level, traits: [...sel.traits], note: $('#rateNote').value.trim(), last: now, count: (rec.count || 0) + 1 });
+  rec.history = [...(rec.history || []), { verdict: rec.verdict, level: rec.level, traits: rec.traits, note: rec.note, date: now }].slice(-20);
+  if (pendingAlias && pendingAlias.nick === key && !rec.aliases.includes(pendingAlias.wrong)) rec.aliases.push(pendingAlias.wrong);
+  pendingAlias = null;
   db[key] = rec; saveDb();
-  toast('Kaydedildi: ' + rec.nick + ' → ' + TAGS[selTag].label);
-  renderStatus();
+  toast(rec.nick + ' kaydedildi: ' + VERDICTS[rec.verdict].label);
+  renderReport();
   setTimeout(() => show('scan'), 700);
 };
 
-/* ---------- Liste ---------- */
+/* ---------- Rakipler ---------- */
 let filter = '';
+const FILTERS = [['', 'Hepsi'], ['kacin', 'Kaçın'], ['dikkat', 'Dikkat'], ['ok', 'Sorun yok'], ['t:toxic', 'Toxic'], ['l:ter', 'Ter / Pro'], ['l:bot', 'Bot']];
+$('#filters').innerHTML = FILTERS.map(([f, l]) => `<button class="chip${f === '' ? ' sel' : ''}" data-f="${f}">${['kacin', 'dikkat', 'ok'].includes(f) ? `<span class="card mini ${f}"></span>` : ''}${l}</button>`).join('');
+$$('#filters .chip').forEach(c => c.onclick = () => { filter = c.dataset.f; $$('#filters .chip').forEach(x => x.classList.toggle('sel', x === c)); renderList(); });
 $('#q').addEventListener('input', renderList);
-document.querySelectorAll('#filters .chip').forEach(c => c.onclick = () => {
-  filter = c.dataset.f;
-  document.querySelectorAll('#filters .chip').forEach(x => x.classList.toggle('on', x === c));
-  renderList();
-});
+function matchFilter(r) {
+  if (!filter) return true;
+  if (filter.startsWith('t:')) return (r.traits || []).includes(filter.slice(2));
+  if (filter.startsWith('l:')) return r.level === filter.slice(2);
+  return r.verdict === filter;
+}
 function renderList() {
   const q = Core.normKey($('#q').value);
-  const arr = dbArr().filter(r => (!filter || r.tag === filter) && (!q || r.key.includes(q))).sort((a, b) => (b.last || 0) - (a.last || 0));
-  $('#count').textContent = '(' + dbArr().length + ')';
+  const all = dbArr();
+  const arr = all.filter(r => matchFilter(r) && (!q || r.key.includes(q))).sort((a, b) => (b.last || 0) - (a.last || 0));
+  $('#count').textContent = all.length ? all.length + ' kayıt' : '';
+  if (!all.length) {
+    $('#list').innerHTML = `<div class="empty"><span class="card bos"></span>Henüz kimseye kart göstermedin.<br>İlk maçından sonra Maç sonu ekranından kaydet.</div>`;
+    return;
+  }
   $('#list').innerHTML = arr.map(r => `
     <div class="item" data-k="${esc(r.key)}">
-      <div class="dot" style="background:${TAGS[r.tag].color}"></div>
+      <span class="card ${r.verdict}"></span>
       <div class="main"><div class="n">${esc(r.nick)}</div>
-        <div class="mute">${TAGS[r.tag].label} · ${r.count || 1} maç · ${fmtDate(r.last)}</div>
-        ${r.note ? `<div style="margin-top:4px">📝 ${esc(r.note)}</div>` : ''}</div>
-      <button class="del" data-del="${esc(r.key)}">🗑</button>
-    </div>`).join('') || '<p class="mute">Kayıt yok.</p>';
-  $('#list').querySelectorAll('.item').forEach(el => el.onclick = e => {
+        <div class="m">${VERDICTS[r.verdict].label}${r.level ? ', ' + LEVELS[r.level] : ''} · ${r.count || 1} maç · ${fmtDate(r.last)}</div>
+        ${r.traits && r.traits.length ? `<div class="traits">${traitHtml(r.traits)}</div>` : ''}
+        ${r.note ? `<div class="m" style="color:var(--chalk);margin-top:6px">“${esc(r.note)}”</div>` : ''}</div>
+      <button class="del" data-del="${esc(r.key)}">Sil</button>
+    </div>`).join('') || '<div class="empty">Bu filtreye uyan rakip yok.</div>';
+  $$('#list .item').forEach(el => el.onclick = e => {
     if (e.target.dataset.del) {
       const r = db[e.target.dataset.del];
-      if (r && confirm(r.nick + ' silinsin mi?')) { delete db[r.key]; saveDb(); renderList(); }
+      if (r && confirm(r.nick + ' listeden silinsin mi?')) { delete db[r.key]; saveDb(); renderList(); }
       return;
     }
-    const r = db[el.dataset.k]; if (r) { show('rate'); openRate(r.nick); }
+    const r = db[el.dataset.k]; if (r) show('rate', r.nick);
   });
 }
 
 /* ---------- Ayarlar ---------- */
-$('#ownNick').value = settings.own;
-$('#invert').checked = settings.invert;
-$('#sound').checked = settings.sound;
-$('#debug').checked = settings.debug;
-$('#ownNick').onchange = () => { settings.own = $('#ownNick').value.trim(); saveSettings(); toast('Kaydedildi'); };
+function renderAccounts() {
+  $('#accounts').innerHTML = settings.owns.map((n, i) => `<div class="acc"><span class="n">${esc(n)}</span>${i === 0 ? '<span class="badge">ana hesap</span>' : ''}<button data-i="${i}">Kaldır</button></div>`).join('')
+    || '<p class="sub">Henüz hesap eklemedin.</p>';
+  $$('#accounts button').forEach(b => b.onclick = () => {
+    const n = settings.owns[+b.dataset.i];
+    if (confirm(n + ' hesaplarından kaldırılsın mı?')) { settings.owns.splice(+b.dataset.i, 1); saveSettings(); renderAccounts(); renderAccLine(); }
+  });
+}
+function renderAccLine() { $('#accLine').textContent = settings.owns.length ? settings.owns.length + ' hesabın tanımlı' : 'Ayarlardan hesabını ekle'; }
+$('#addAccBtn').onclick = () => {
+  const n = $('#newAcc').value.trim();
+  if (!n) return toast('Bir PSN adı yaz');
+  if (Core.isOwn(n, settings.owns) && settings.owns.some(o => Core.normKey(o) === Core.normKey(n))) return toast('Bu hesap zaten ekli');
+  settings.owns.push(n); saveSettings(); $('#newAcc').value = ''; renderAccounts(); renderAccLine(); toast(n + ' eklendi');
+};
+$('#newAcc').addEventListener('keydown', e => { if (e.key === 'Enter') $('#addAccBtn').click(); });
+$('#invert').checked = settings.invert; $('#sound').checked = settings.sound; $('#debug').checked = settings.debug;
 $('#invert').onchange = () => { settings.invert = $('#invert').checked; saveSettings(); };
 $('#sound').onchange = () => { settings.sound = $('#sound').checked; saveSettings(); };
 $('#debug').onchange = () => { settings.debug = $('#debug').checked; saveSettings(); };
 
 $('#exportBtn').onclick = async () => {
-  const data = JSON.stringify({ app: 'rakip-radar', version: VERSION, date: new Date().toISOString(), db }, null, 1);
+  const data = JSON.stringify({ app: 'rakip-radar', version: VERSION, date: new Date().toISOString(), owns: settings.owns, db }, null, 1);
   const name = 'rakip-radar-yedek-' + new Date().toISOString().slice(0, 10) + '.json';
   const file = new File([data], name, { type: 'application/json' });
-  try {
-    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'Rakip Radar yedeği' }); return; }
-  } catch (e) { if (e.name === 'AbortError') return; }
+  try { if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'Rakip Radar yedeği' }); return; } }
+  catch (e) { if (e.name === 'AbortError') return; }
   const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = name; a.click();
 };
 $('#importBtn').onclick = () => $('#importFile').click();
 $('#importFile').onchange = async e => {
   const f = e.target.files[0]; if (!f) return;
   try {
-    const j = JSON.parse(await f.text());
-    const inc = j.db || j; let n = 0;
-    for (const k in inc) { const r = inc[k]; if (r && r.nick && r.tag) { r.key = Core.normKey(r.nick); if (!db[r.key] || (r.last || 0) > (db[r.key].last || 0)) { db[r.key] = r; n++; } } }
-    saveDb(); toast(n + ' kayıt yüklendi'); renderList();
-  } catch (err) { toast('Dosya okunamadı'); }
+    const j = JSON.parse(await f.text()), inc = j.db || j; let n = 0;
+    for (const k in inc) {
+      const r = inc[k]; if (!r || !r.nick) continue;
+      r.key = Core.normKey(r.nick); r.traits = r.traits || []; r.aliases = r.aliases || [];
+      if (!r.verdict) r.verdict = { toxic: 'kacin', iyi: 'dikkat' }[r.tag] || 'ok';
+      if (!db[r.key] || (r.last || 0) > (db[r.key].last || 0)) { db[r.key] = r; n++; }
+    }
+    if (Array.isArray(j.owns)) for (const o of j.owns) if (!settings.owns.includes(o)) settings.owns.push(o);
+    saveDb(); saveSettings(); toast(n + ' kayıt yüklendi'); renderList(); renderAccounts(); renderAccLine();
+  } catch (err) { toast('Bu dosya bir Rakip Radar yedeği değil'); }
   e.target.value = '';
 };
 
-renderStatus();
-drawRoi();
+renderReport(); renderAccLine(); drawRoi();
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 </body>

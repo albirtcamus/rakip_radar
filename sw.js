@@ -1,5 +1,5 @@
 // Uygulamayı internet yavaşken de hızlı açmak için önbellek.
-const CACHE = 'rakip-radar-v1';
+const CACHE = 'rakip-radar-v2';
 const SHELL = ['./', 'index.html', 'core.js', 'manifest.json', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => {
