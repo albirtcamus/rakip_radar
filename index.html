@@ -277,10 +277,10 @@
 </nav>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script src="core.js?v=2.2"></script>
+<script src="core.js?v=2.3"></script>
 <script>
 'use strict';
-const VERSION = '2.2';
+const VERSION = '2.3';
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 
@@ -400,7 +400,7 @@ async function startScan() {
   try {
     if (!stream) {
       $('#camHint').textContent = 'Kamera açılıyor…';
-      stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } } });
+      stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } } });
       video.srcObject = stream;
       await video.play();
     }
