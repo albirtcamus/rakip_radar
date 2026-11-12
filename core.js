@@ -142,6 +142,6 @@
     return null;
   }
 
-  root.Core = { VERSION: '2.1', normKey, lev, score, threshold, findKnown, extractOpponent, isOwn };
+  root.Core = { VERSION: '2.2', normKey, lev, score, threshold, findKnown, extractOpponent, isOwn };
   if (typeof module !== 'undefined') module.exports = root.Core;
 })(typeof self !== 'undefined' ? self : this);

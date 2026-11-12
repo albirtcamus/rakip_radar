@@ -245,6 +245,8 @@
   <h2>Tarama</h2>
   <label class="sw"><span>Renkleri ters çevir<small>Koyu PS ekranlarında okumayı iyileştirir</small></span><input type="checkbox" id="invert"></label>
   <label class="sw"><span>Sesli uyarı<small>Telefon sessizdeyse çalmayabilir</small></span><input type="checkbox" id="sound"></label>
+  <label class="sw"><span>Rakip bulununca kamerayı kapat<small>Uyarıdan 15 saniye sonra kamera kapanır, maç boyunca pil harcamaz</small></span><input type="checkbox" id="autoPause"></label>
+  <label class="sw"><span>Maç sonu kaydedince taramayı başlat<small>Bir sonraki rakip için kamera kendiliğinden açılır</small></span><input type="checkbox" id="autoResume"></label>
   <label class="sw"><span>Okunan metni göster<small>Okuma sorunlarını incelemek için</small></span><input type="checkbox" id="debug"></label>
 
   <h2>Yedek</h2>
@@ -275,10 +277,10 @@
 </nav>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script src="core.js?v=2.1"></script>
+<script src="core.js?v=2.2"></script>
 <script>
 'use strict';
-const VERSION = '2.1';
+const VERSION = '2.2';
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 
@@ -317,7 +319,7 @@ const store = {
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { toast('Kaydedilemedi: telefon hafızası dolu olabilir'); } },
 };
 let db = store.get('rr_db', {});
-let settings = Object.assign({ owns: null, own: 'Albirtcamus', invert: true, sound: true, debug: false, roi: null }, store.get('rr_settings', {}));
+let settings = Object.assign({ owns: null, own: 'Albirtcamus', invert: true, sound: true, debug: false, roi: null, autoPause: true, autoResume: true }, store.get('rr_settings', {}));
 if (!Array.isArray(settings.owns)) settings.owns = settings.own ? [settings.own] : [];
 let current = store.get('rr_current', null);
 let recent = store.get('rr_recent', []);
@@ -398,7 +400,7 @@ async function startScan() {
   try {
     if (!stream) {
       $('#camHint').textContent = 'Kamera açılıyor…';
-      stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } } });
+      stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } } });
       video.srcObject = stream;
       await video.play();
     }
@@ -425,10 +427,19 @@ async function startScan() {
   btn.disabled = false;
 }
 
-function stopScan() {
+let autoStopT = null;
+// Taramayı durdurur ve kamerayı tamamen kapatır (pil için). reason: 'auto' = rakip bulunduktan sonra otomatik
+function stopScan(reason) {
   scanning = false;
+  clearTimeout(autoStopT); autoStopT = null;
   const btn = $('#startBtn'); btn.textContent = 'Taramayı başlat'; btn.classList.remove('live');
-  $('#perf').textContent = 'Tarama durdu.';
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  video.srcObject = null;
+  $('#camHint').style.display = 'flex';
+  $('#camHint').textContent = reason === 'auto'
+    ? 'Rakip bulundu, kamera pil için kapatıldı. Maç bitince değerlendir; kayıttan sonra tarama yeniden başlar.'
+    : 'Kamera kapalı. Bir sonraki rakip için taramayı başlat.';
+  $('#perf').textContent = 'Kamera kapalı.';
   if (wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; }
 }
 document.addEventListener('visibilitychange', async () => {
@@ -470,7 +481,7 @@ async function loop() {
     let err = null;
     try { const { data } = await worker.recognize(frame); handleText(data.text || ''); } catch (e) { err = e; console.warn(e); }
     $('#perf').textContent = err ? 'Okuma hatası: ' + (err.message || err) : 'Taranıyor · kare başına ' + Math.round(performance.now() - t0) + ' ms';
-    await sleep(60);
+    await sleep(250);
   }
 }
 
@@ -515,6 +526,7 @@ function setOpponent(nick, rawRead) {
   if (same) return;
   const v = rec ? rec.verdict : 'yeni';
   showFlash(v, name, rec);
+  if (settings.autoPause) { clearTimeout(autoStopT); autoStopT = setTimeout(() => { if (scanning) stopScan('auto'); }, 15000); }
   beep(SOUNDS[v]);
   if (navigator.vibrate) navigator.vibrate(v === 'kacin' ? [300, 100, 300, 100, 300] : [150]);
 }
@@ -646,7 +658,8 @@ $('#saveBtn').onclick = () => {
   db[key] = rec; saveDb();
   toast(rec.nick + ' kaydedildi: ' + VERDICTS[rec.verdict].label);
   renderReport();
-  setTimeout(() => show('scan'), 700);
+  show('scan');
+  if (settings.autoResume && !scanning) startScan();
 };
 
 /* ---------- Rakipler ---------- */
@@ -710,6 +723,9 @@ $('#invert').checked = settings.invert; $('#sound').checked = settings.sound; $(
 $('#invert').onchange = () => { settings.invert = $('#invert').checked; saveSettings(); };
 $('#sound').onchange = () => { settings.sound = $('#sound').checked; saveSettings(); };
 $('#debug').onchange = () => { settings.debug = $('#debug').checked; saveSettings(); };
+$('#autoPause').checked = settings.autoPause; $('#autoResume').checked = settings.autoResume;
+$('#autoPause').onchange = () => { settings.autoPause = $('#autoPause').checked; saveSettings(); };
+$('#autoResume').onchange = () => { settings.autoResume = $('#autoResume').checked; saveSettings(); };
 
 $('#exportBtn').onclick = async () => {
   const data = JSON.stringify({ app: 'rakip-radar', version: VERSION, date: new Date().toISOString(), owns: settings.owns, db }, null, 1);
